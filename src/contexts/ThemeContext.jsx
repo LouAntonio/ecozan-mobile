@@ -1,5 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useColorScheme } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const THEME_STORAGE_KEY = '@ecozan_theme';
 
 // Definição das cores para cada tema
 export const themes = {
@@ -99,12 +102,68 @@ export const themes = {
 	},
 };
 
-const ThemeContext = createContext();
+// Valor padrão do contexto
+const defaultContextValue = {
+	themeMode: 'light',
+	isDark: false,
+	isSystemTheme: false,
+	isLoading: true,
+	colors: themes.light,
+	toggleTheme: () => {},
+	setTheme: () => {},
+	useSystemTheme: () => {},
+};
+
+const ThemeContext = createContext(defaultContextValue);
 
 export function ThemeProvider({ children }) {
 	const systemColorScheme = useColorScheme();
-	const [themeMode, setThemeMode] = useState(systemColorScheme || 'dark');
-	const [isSystemTheme, setIsSystemTheme] = useState(true);
+	const [themeMode, setThemeMode] = useState('light'); // Tema inicial: light
+	const [isSystemTheme, setIsSystemTheme] = useState(false);
+	const [isLoading, setIsLoading] = useState(true);
+
+	// Carrega o tema salvo ao iniciar
+	useEffect(() => {
+		loadSavedTheme();
+	}, []);
+
+	// Salva o tema quando muda
+	useEffect(() => {
+		if (!isLoading) {
+			saveTheme();
+		}
+	}, [themeMode, isSystemTheme]);
+
+	const loadSavedTheme = async () => {
+		try {
+			const savedTheme = await AsyncStorage.getItem(THEME_STORAGE_KEY);
+			if (savedTheme) {
+				const { mode, isSystem } = JSON.parse(savedTheme);
+				setIsSystemTheme(isSystem);
+				if (isSystem && systemColorScheme) {
+					setThemeMode(systemColorScheme);
+				} else if (mode === 'dark' || mode === 'light') {
+					setThemeMode(mode);
+				}
+			}
+			// Se não há tema salvo, mantém 'light' como padrão
+		} catch (error) {
+			console.error('Erro ao carregar tema:', error);
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	const saveTheme = async () => {
+		try {
+			await AsyncStorage.setItem(
+				THEME_STORAGE_KEY,
+				JSON.stringify({ mode: themeMode, isSystem: isSystemTheme })
+			);
+		} catch (error) {
+			console.error('Erro ao salvar tema:', error);
+		}
+	};
 
 	// Atualiza o tema quando o sistema muda (se estiver seguindo o sistema)
 	useEffect(() => {
@@ -131,12 +190,14 @@ export function ThemeProvider({ children }) {
 	};
 
 	const isDark = themeMode === 'dark';
-	const colors = themes[themeMode];
+	// Garante que sempre há um tema válido
+	const colors = themes[themeMode] || themes.light;
 
 	const value = {
 		themeMode,
 		isDark,
 		isSystemTheme,
+		isLoading,
 		colors,
 		toggleTheme,
 		setTheme,
@@ -152,8 +213,9 @@ export function ThemeProvider({ children }) {
 
 export function useTheme() {
 	const context = useContext(ThemeContext);
-	if (!context) {
-		throw new Error('useTheme must be used within a ThemeProvider');
+	if (!context || !context.colors) {
+		// Retorna valores padrão se o contexto não estiver disponível
+		return defaultContextValue;
 	}
 	return context;
 }

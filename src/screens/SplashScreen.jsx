@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, Animated, StyleSheet } from 'react-native';
+import { View, Text, Animated, StyleSheet, Image } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useTheme } from '../contexts';
 
@@ -88,18 +88,11 @@ export default function SplashScreen({ onFinish }) {
 					],
 				}]}
 			>
-				{/* Ícone da Folha */}
-				<Animated.View
-					style={[styles.leafWrapper, { transform: [{ rotate: leafRotation }] }]}
-				>
-					<View style={[styles.leafContainer, { backgroundColor: colors.primary.vivid + '30' }]}>
-						<Text style={styles.leafEmoji}>🌿</Text>
-					</View>
-				</Animated.View>
-
+				{/* icone do app */}
+				<Image source={require('../../assets/iconBG.png')} style={{ width: 120, height: 120 }} />
 				{/* Nome do App */}
 				<Text style={[styles.appName, { color: colors.text.primary }]}>
-					Ecozan
+					ECOZAN
 				</Text>
 
 				{/* Tagline */}

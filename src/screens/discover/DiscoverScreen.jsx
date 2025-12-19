@@ -7,21 +7,40 @@ export default function DiscoverScreen() {
 
 	return (
 		<ScrollView
-			className="flex-1 bg-background-primary"
+			className="flex-1"
+			style={{ backgroundColor: colors.background.primary }}
 			contentContainerClassName="p-5"
 		>
-			<Text className="text-[28px] font-bold text-text-primary mb-2">
+			<Text
+				className="text-[28px] font-bold mb-2"
+				style={{ color: colors.text.primary }}
+			>
 				Descubra
 			</Text>
-			<Text className="text-base text-text-secondary mb-6">
+			<Text
+				className="text-base mb-6"
+				style={{ color: colors.text.secondary }}
+			>
 				Explore as melhores experiências em Zanzibar
 			</Text>
 
-			<View className="bg-surface-card rounded-2xl p-5 border border-border-light">
-				<Text className="text-lg font-semibold text-text-primary mb-2">
+			<View
+				className="rounded-2xl p-5 border"
+				style={{
+					backgroundColor: colors.surface.card,
+					borderColor: colors.border.light
+				}}
+			>
+				<Text
+					className="text-lg font-semibold mb-2"
+					style={{ color: colors.text.primary }}
+				>
 					🌴 Bem-vindo ao Ecozan
 				</Text>
-				<Text className="text-sm text-text-secondary leading-6">
+				<Text
+					className="text-sm leading-6"
+					style={{ color: colors.text.secondary }}
+				>
 					Descubra passeios incríveis, transporte confortável e hospedagens únicas em Zanzibar.
 				</Text>
 			</View>

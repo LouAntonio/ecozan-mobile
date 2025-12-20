@@ -13,6 +13,8 @@ export default function MenuScreen() {
 		avatar: 'https://i.pravatar.cc/150?img=12',
 		memberSince: 'Membro desde 2024',
 		completedBookings: 5,
+		completedStays: 12,
+		completedTransports: 7,
 		verified: true,
 	};
 
@@ -176,20 +178,23 @@ export default function MenuScreen() {
 					</View>
 
 					<View className="flex-1 ml-4">
-						<View className="flex-row items-center mb-1">
+						<View className="mb-1">
+							<View className="flex-row items-center">
+								<Text
+									className="text-2xl font-bold"
+									style={{ color: colors.text.primary }}
+								>
+									{user.name}
+								</Text>
+							</View>
 							<Text
-								className="text-2xl font-bold"
-								style={{ color: colors.text.primary }}
+								className="text-sm mb-2"
+								style={{ color: colors.text.secondary }}
 							>
-								{user.name}
+								{user.email}
 							</Text>
 						</View>
-						<Text
-							className="text-sm mb-2"
-							style={{ color: colors.text.secondary }}
-						>
-							{user.email}
-						</Text>
+
 						<View className="flex-row items-center">
 							<Ionicons name="calendar-outline" size={12} color={colors.text.secondary} />
 							<Text
@@ -213,7 +218,7 @@ export default function MenuScreen() {
 					</TouchableOpacity>
 				</View>
 
-				{/* Stats rápidas */}
+				{/* Stats rápidas: Viagens, Hospedagens, Transportes */}
 				<View className="flex-row gap-3">
 					<View
 						className="flex-1 rounded-2xl p-4"
@@ -246,18 +251,18 @@ export default function MenuScreen() {
 							borderColor: isDark ? `${colors.primary.vivid}20` : colors.border.light,
 						}}
 					>
-						<Ionicons name="trophy" size={20} color="#F59E0B" style={{ marginBottom: 4 }} />
+						<Ionicons name="home" size={20} color={colors.primary.vivid} style={{ marginBottom: 4 }} />
 						<Text
 							className="text-2xl font-bold mb-0.5"
 							style={{ color: colors.text.primary }}
 						>
-							350
+							{user.completedStays}
 						</Text>
 						<Text
 							className="text-xs"
 							style={{ color: colors.text.secondary }}
 						>
-							Pontos
+							Hospedagens
 						</Text>
 					</View>
 
@@ -269,18 +274,18 @@ export default function MenuScreen() {
 							borderColor: isDark ? `${colors.primary.vivid}20` : colors.border.light,
 						}}
 					>
-						<Ionicons name="heart" size={20} color="#EF4444" style={{ marginBottom: 4 }} />
+						<Ionicons name="car" size={20} color={colors.primary.vivid} style={{ marginBottom: 4 }} />
 						<Text
 							className="text-2xl font-bold mb-0.5"
 							style={{ color: colors.text.primary }}
 						>
-							8
+							{user.completedTransports}
 						</Text>
 						<Text
 							className="text-xs"
 							style={{ color: colors.text.secondary }}
 						>
-							Favoritos
+							Transportes
 						</Text>
 					</View>
 				</View>

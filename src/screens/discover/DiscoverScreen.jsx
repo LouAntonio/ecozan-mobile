@@ -12,7 +12,7 @@ export default function DiscoverScreen() {
 		{ id: 'all', label: 'Tudo', icon: 'globe-outline' },
 		{ id: 'stays', label: 'Hospedagem', icon: 'bed-outline' },
 		{ id: 'transport', label: 'Transporte', icon: 'car-outline' },
-		{ id: 'packages', label: 'Pacotes', icon: 'gift-outline' },
+		{ id: 'packages', label: 'Pacotes Turísticos', icon: 'map-outline' },
 	];
 
 	// Hospedagens
@@ -20,31 +20,31 @@ export default function DiscoverScreen() {
 		{
 			id: 1,
 			category: 'stays',
-			title: 'Villa Paradise Beach',
+			title: 'Casa do Mar - Luanda',
 			image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800',
-			price: '150',
+			price: '15000',
 			rating: 4.9,
-			location: 'Nungwi',
+			location: 'Ilha do Mussulo, Luanda',
 			amenities: ['Wi-Fi', 'Piscina', 'Vista Mar'],
 		},
 		{
 			id: 2,
 			category: 'stays',
-			title: 'Resort Tropical Bay',
+			title: 'Resort do Mussulo',
 			image: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800',
-			price: '220',
+			price: '35000',
 			rating: 4.8,
-			location: 'Kendwa',
+			location: 'Mussulo, Luanda',
 			amenities: ['All Inclusive', 'Spa', 'Praia Privada'],
 		},
 		{
 			id: 3,
 			category: 'stays',
-			title: 'Boutique Hotel Stone Town',
+			title: 'Hotel Centro Luanda',
 			image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
-			price: '95',
+			price: '12000',
 			rating: 4.7,
-			location: 'Stone Town',
+			location: 'Avenida 17 de Setembro, Luanda',
 			amenities: ['Centro Histórico', 'Café da Manhã', 'Terraço'],
 		},
 	];
@@ -54,21 +54,21 @@ export default function DiscoverScreen() {
 		{
 			id: 1,
 			category: 'transport',
-			title: 'Transfer Aeroporto VIP',
+			title: 'Transfer Aeroporto - Luanda VIP',
 			image: 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=800',
-			price: '35',
+			price: '4500',
 			rating: 5.0,
-			location: 'Aeroporto',
+			location: 'Aeroporto 4 de Fevereiro, Luanda',
 			amenities: ['Conforto', 'Pontual', 'Seguro'],
 		},
 		{
 			id: 2,
 			category: 'transport',
-			title: 'Aluguel de Carro SUV',
+			title: 'Aluguel de 4x4 - Benguela',
 			image: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800',
-			price: '80',
+			price: '12000',
 			rating: 4.8,
-			location: 'Zanzibar',
+			location: 'Benguela',
 			amenities: ['4x4', 'GPS', 'Seguro Total'],
 		},
 		{
@@ -76,9 +76,9 @@ export default function DiscoverScreen() {
 			category: 'transport',
 			title: 'Motorista Privado - Dia Completo',
 			image: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800',
-			price: '90',
+			price: '10000',
 			rating: 4.9,
-			location: 'Toda Ilha',
+			location: 'Luanda e arredores',
 			amenities: ['Guia Local', 'Flexível', 'Wi-Fi'],
 		},
 	];
@@ -88,48 +88,48 @@ export default function DiscoverScreen() {
 		{
 			id: 1,
 			category: 'packages',
-			title: 'Pacote Lua de Mel',
-			description: '5 dias · Villa + Passeios + Transfer',
+			title: 'Pacote Romântico - Mussulo',
+			description: '4 dias · Villa + Passeios + Transfer',
 			image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800',
-			price: '890',
+			price: '195000',
 			discount: '15%',
 			rating: 5.0,
-			location: 'Nungwi Beach',
+			location: 'Ilha do Mussulo, Luanda',
 			features: ['Villa Privativa', 'Jantar Romântico', 'Spa Incluído'],
 		},
 		{
 			id: 2,
 			category: 'packages',
-			title: 'Aventura Completa',
-			description: '7 dias · Hotel + Tours + Carro',
+			title: 'Aventura Benguela & Lobito',
+			description: '6 dias · Hotel + Tours + Carro',
 			image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
-			price: '1200',
+			price: '320000',
 			discount: '20%',
 			rating: 4.9,
-			location: 'Zanzibar',
-			features: ['Hotel 5 Estrelas', 'Carro Incluso', 'Guia Turístico'],
+			location: 'Benguela & Lobito',
+			features: ['Hotel 4 Estrelas', 'Carro Incluso', 'Guia Turístico'],
 		},
 		{
 			id: 3,
 			category: 'packages',
-			title: 'Família & Diversão',
-			description: '6 dias · Resort + Atividades + Meals',
+			title: 'Família Luanda & Mussulo',
+			description: '5 dias · Resort + Atividades + Meals',
 			image: 'https://images.unsplash.com/photo-1540541338287-41700207dee6?w=800',
-			price: '1450',
+			price: '250000',
 			discount: '18%',
 			rating: 4.8,
-			location: 'Kendwa',
+			location: 'Luanda',
 			features: ['All Inclusive', 'Kids Club', 'Atividades Aquáticas'],
 		},
 	];
 
 	// Experiências populares (linhas)
 	const experiences = [
-		{ id: 1, title: 'Mergulho com Golfinhos', image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800', color: '#3B82F6', description: 'Nado com golfinhos selvagens' },
-		{ id: 2, title: 'Safari Blue', image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800', color: '#10B981', description: 'Aventura no oceano Índico' },
-		{ id: 3, title: 'Spice Tour', image: 'https://images.unsplash.com/photo-1511988617509-a57c8a288659?w=800', color: '#F59E0B', description: 'Plantações de especiarias' },
-		{ id: 5, title: 'Jozani Forest', image: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800', color: '#8B5CF6', description: 'Floresta tropical e macacos' },
-		{ id: 6, title: 'Prison Island', image: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800', color: '#06B6D4', description: 'Tartarugas gigantes' },
+		{ id: 1, title: 'Passeio à Ilha do Mussulo', image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800', color: '#3B82F6', description: 'Praias e dunas perto de Luanda' },
+		{ id: 2, title: 'Mercado Popular', image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800', color: '#10B981', description: 'Feiras e artesanato local' },
+		{ id: 3, title: 'Museu Nacional de História', image: 'https://images.unsplash.com/photo-1511988617509-a57c8a288659?w=800', color: '#F59E0B', description: 'Património e cultura angolana' },
+		{ id: 5, title: 'Parque Natural Iona', image: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800', color: '#8B5CF6', description: 'Vida selvagem e paisagens únicas' },
+		{ id: 6, title: 'Praia da Barra do Dande', image: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800', color: '#06B6D4', description: 'Sol e mar no Namibe' },
 	];
 	// Função para filtrar itens
 	const getFilteredItems = () => {
@@ -367,17 +367,21 @@ export default function DiscoverScreen() {
 											A partir de
 										</Text>
 										<View className="flex-row items-baseline">
-											<Text
+												<Text
 												className="text-3xl font-bold"
 												style={{ color: colors.primary.vivid }}
 											>
-												${item.price}
+												Kz {item.price}
 											</Text>
 											<Text
 												className="text-sm ml-1"
 												style={{ color: colors.text.secondary }}
 											>
-												{item.category === 'packages' ? '/pessoa' : '/dia'}
+												{item.category === 'packages' ? (
+													<Ionicons name="person" size={12} color={colors.text.secondary} style={{ marginLeft: 6 }} />
+												) : (
+													<Text>/dia</Text>
+												)}
 											</Text>
 										</View>
 									</View>
@@ -392,8 +396,7 @@ export default function DiscoverScreen() {
 											elevation: 4,
 										}}
 									>
-										<Text className="text-white font-bold mr-1">Reservar</Text>
-										<Ionicons name="arrow-forward" size={16} color="#FFFFFF" />
+										<Ionicons name="information-circle" size={18} color="#FFFFFF" />
 									</TouchableOpacity>
 								</View>
 							</View>

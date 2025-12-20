@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Image, TextInput } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Image, TextInput, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../contexts';
 
@@ -8,6 +8,9 @@ export default function BookingsScreen() {
 	const [selectedProvince, setSelectedProvince] = useState('all');
 	const [selectedMunicipality, setSelectedMunicipality] = useState('all');
 	const [priceRange, setPriceRange] = useState('all');
+	const [showFilters, setShowFilters] = useState(false);
+	const [priceMin, setPriceMin] = useState('');
+	const [priceMax, setPriceMax] = useState('');
 
 	// Províncias e Municípios de Angola
 	const provinces = [
@@ -40,10 +43,10 @@ export default function BookingsScreen() {
 	];
 
 	const priceRanges = [
-		{ id: 'all', label: 'Qualquer preço', min: 0, max: 999999 },
-		{ id: 'budget', label: 'Até $50', min: 0, max: 50 },
-		{ id: 'mid', label: '$50 - $100', min: 50, max: 100 },
-		{ id: 'luxury', label: '$100+', min: 100, max: 999999 },
+		{ id: 'all', label: 'Qualquer preço', min: 0, max: 999999999 },
+		{ id: 'budget', label: 'Até Kz 50.000', min: 0, max: 50000 },
+		{ id: 'mid', label: 'Kz 50.000 - Kz 150.000', min: 50000, max: 150000 },
+		{ id: 'luxury', label: 'Kz 150.000+', min: 150000, max: 999999999 },
 	];
 
 	// Hospedagens disponíveis
@@ -54,7 +57,7 @@ export default function BookingsScreen() {
 			province: 'luanda',
 			municipality: 'Luanda',
 			image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800',
-			price: 85,
+			price: 85000,
 			rating: 4.9,
 			reviews: 127,
 			type: 'Apartamento',
@@ -71,7 +74,7 @@ export default function BookingsScreen() {
 			province: 'luanda',
 			municipality: 'Belas',
 			image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800',
-			price: 250,
+			price: 250000,
 			rating: 5.0,
 			reviews: 89,
 			type: 'Villa',
@@ -88,7 +91,7 @@ export default function BookingsScreen() {
 			province: 'luanda',
 			municipality: 'Belas',
 			image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800',
-			price: 120,
+			price: 120000,
 			rating: 4.8,
 			reviews: 64,
 			type: 'Casa',
@@ -105,7 +108,7 @@ export default function BookingsScreen() {
 			province: 'luanda',
 			municipality: 'Luanda',
 			image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800',
-			price: 45,
+			price: 45000,
 			rating: 4.6,
 			reviews: 156,
 			type: 'Apartamento',
@@ -122,7 +125,7 @@ export default function BookingsScreen() {
 			province: 'benguela',
 			municipality: 'Lobito',
 			image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
-			price: 95,
+			price: 95000,
 			rating: 4.9,
 			reviews: 203,
 			type: 'Hotel',
@@ -139,7 +142,7 @@ export default function BookingsScreen() {
 			province: 'huila',
 			municipality: 'Lubango',
 			image: 'https://images.unsplash.com/photo-1587381420270-3e1a5b9e6904?w=800',
-			price: 70,
+			price: 70000,
 			rating: 4.7,
 			reviews: 45,
 			type: 'Chalé',
@@ -159,7 +162,9 @@ export default function BookingsScreen() {
 		const provinceMatch = selectedProvince === 'all' || property.province === selectedProvince;
 		const municipalityMatch = selectedMunicipality === 'all' || selectedMunicipality === 'Todos' || property.municipality === selectedMunicipality;
 		const priceRangeData = priceRanges.find(pr => pr.id === priceRange);
-		const priceMatch = property.price >= priceRangeData.min && property.price <= priceRangeData.max;
+		const min = priceMin !== '' ? Number(priceMin) : priceRangeData.min;
+		const max = priceMax !== '' ? Number(priceMax) : priceRangeData.max;
+		const priceMatch = property.price >= min && property.price <= max;
 		return provinceMatch && municipalityMatch && priceMatch;
 	});
 
@@ -212,7 +217,102 @@ export default function BookingsScreen() {
 						className="flex-1 ml-3 text-base"
 						style={{ color: colors.text.primary }}
 					/>
+					<TouchableOpacity onPress={() => setShowFilters(true)}>
+						<Ionicons name="options-outline" size={22} color={colors.primary.vivid} />
+					</TouchableOpacity>
 				</View>
+
+				{/* Modal de Filtros */}
+				<Modal visible={showFilters} animationType="slide" transparent>
+					<View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'center', padding: 20 }}>
+						<View className="rounded-2xl p-4" style={{ backgroundColor: colors.surface.card }}>
+							<View className="flex-row justify-between items-center mb-3">
+								<Text className="text-lg font-bold" style={{ color: colors.text.primary }}>Filtros</Text>
+								<TouchableOpacity onPress={() => setShowFilters(false)}>
+									<Ionicons name="close" size={22} color={colors.text.secondary} />
+								</TouchableOpacity>
+							</View>
+
+							<Text className="text-sm font-semibold mb-2" style={{ color: colors.text.secondary }}>Província</Text>
+							<View className="flex-row flex-wrap mb-3">
+								{provinces.map((province) => {
+									const isSelected = selectedProvince === province.id;
+									return (
+										<TouchableOpacity
+											key={province.id}
+											onPress={() => { setSelectedProvince(province.id); setSelectedMunicipality('all'); }}
+											activeOpacity={0.8}
+											className="px-4 py-2 rounded-xl mr-2 mb-2"
+											style={{ backgroundColor: isSelected ? colors.primary.vivid : colors.surface.card, borderWidth: 1.5, borderColor: isSelected ? colors.primary.vivid : colors.border.light }}
+										>
+											<Text style={{ color: isSelected ? '#FFFFFF' : colors.text.primary }}>{province.name}</Text>
+										</TouchableOpacity>
+									);
+								})}
+							</View>
+
+							{selectedProvince !== 'all' && (
+								<>
+									<Text className="text-sm font-semibold mb-2" style={{ color: colors.text.secondary }}>Município</Text>
+									<View className="flex-row flex-wrap mb-3">
+										{(provinces.find(p => p.id === selectedProvince)?.municipalities || []).map((municipality, index) => {
+											const municipalityId = index === 0 ? 'all' : municipality;
+											const isSelected = selectedMunicipality === municipalityId || (index === 0 && selectedMunicipality === 'all');
+											return (
+												<TouchableOpacity key={municipality} onPress={() => setSelectedMunicipality(municipalityId)} activeOpacity={0.8} className="px-4 py-2 rounded-xl mr-2 mb-2" style={{ backgroundColor: isSelected ? colors.primary.vivid : colors.surface.card, borderWidth: 1.5, borderColor: isSelected ? colors.primary.vivid : colors.border.light }}>
+												<Text style={{ color: isSelected ? '#FFFFFF' : colors.text.primary }}>{municipality}</Text>
+											</TouchableOpacity>
+											);
+										})}
+									</View>
+								</>
+							)}
+
+							<Text className="text-sm font-semibold mb-2" style={{ color: colors.text.secondary }}>Faixa de Preço</Text>
+							<View className="flex-row flex-wrap mb-3">
+								{priceRanges.map((range) => {
+									const isSelected = priceRange === range.id;
+									return (
+										<TouchableOpacity key={range.id} onPress={() => setPriceRange(range.id)} activeOpacity={0.8} className="px-4 py-2 rounded-xl mr-2 mb-2" style={{ backgroundColor: isSelected ? colors.primary.vivid : colors.surface.card, borderWidth: 1.5, borderColor: isSelected ? colors.primary.vivid : colors.border.light }}>
+										<Text style={{ color: isSelected ? '#FFFFFF' : colors.text.primary }}>{range.label}</Text>
+									</TouchableOpacity>
+									);
+								})}
+							</View>
+
+								{/* Filtro manual de preço */}
+								<View className="flex-row items-center gap-2 mb-3">
+									<TextInput
+										placeholder="Kz mínima"
+										placeholderTextColor={colors.text.secondary}
+										className="flex-1 px-3 py-2 rounded-xl"
+										style={{ backgroundColor: colors.surface.card, color: colors.text.primary }}
+										keyboardType="numeric"
+										value={priceMin}
+										onChangeText={setPriceMin}
+									/>
+									<TextInput
+										placeholder="Kz máxima"
+										placeholderTextColor={colors.text.secondary}
+										className="flex-1 px-3 py-2 rounded-xl"
+										style={{ backgroundColor: colors.surface.card, color: colors.text.primary }}
+										keyboardType="numeric"
+										value={priceMax}
+										onChangeText={setPriceMax}
+									/>
+								</View>
+
+							<View className="flex-row justify-end mt-4">
+								<TouchableOpacity onPress={() => { setSelectedProvince('all'); setSelectedMunicipality('all'); setPriceRange('all'); }}>
+									<Text style={{ color: colors.text.secondary }}>Limpar</Text>
+								</TouchableOpacity>
+								<TouchableOpacity onPress={() => setShowFilters(false)} className="ml-4 px-4 py-2 rounded-2xl" style={{ backgroundColor: colors.primary.vivid }}>
+									<Text style={{ color: '#FFFFFF', fontWeight: '700' }}>Aplicar</Text>
+								</TouchableOpacity>
+							</View>
+						</View>
+					</View>
+				</Modal>
 			</View>
 
 			{/* Filtros Rápidos - Stats */}
@@ -266,143 +366,7 @@ export default function BookingsScreen() {
 				</ScrollView>
 			</View>
 
-			{/* Filtro de Província */}
-			<View className="mb-4">
-				<View className="px-5 mb-3">
-					<Text className="text-xl font-bold" style={{ color: colors.text.primary }}>
-						Província
-					</Text>
-				</View>
-				<ScrollView
-					horizontal
-					showsHorizontalScrollIndicator={false}
-					contentContainerStyle={{ paddingHorizontal: 20, gap: 10 }}
-				>
-					{provinces.map((province) => {
-						const isSelected = selectedProvince === province.id;
-						return (
-							<TouchableOpacity
-								key={province.id}
-								onPress={() => {
-									setSelectedProvince(province.id);
-									setSelectedMunicipality('all');
-								}}
-								activeOpacity={0.7}
-								className="px-5 py-3 rounded-2xl"
-								style={{
-									backgroundColor: isSelected ? colors.primary.vivid : colors.surface.card,
-									borderWidth: 1.5,
-									borderColor: isSelected
-										? colors.primary.vivid
-										: isDark ? `${colors.primary.vivid}20` : colors.border.light,
-									shadowColor: isSelected ? colors.primary.vivid : 'transparent',
-									shadowOffset: { width: 0, height: 2 },
-									shadowOpacity: 0.3,
-									shadowRadius: 4,
-									elevation: isSelected ? 3 : 0,
-								}}
-							>
-								<Text
-									className="font-semibold"
-									style={{ color: isSelected ? '#FFFFFF' : colors.text.primary }}
-								>
-									{province.name}
-								</Text>
-							</TouchableOpacity>
-						);
-					})}
-				</ScrollView>
-			</View>
 
-			{/* Filtro de Município */}
-			{selectedProvince !== 'all' && currentMunicipalities.length > 0 && (
-				<View className="mb-4">
-					<View className="px-5 mb-3">
-						<Text className="text-sm font-bold" style={{ color: colors.text.secondary }}>
-							Município
-						</Text>
-					</View>
-					<ScrollView
-						horizontal
-						showsHorizontalScrollIndicator={false}
-						contentContainerStyle={{ paddingHorizontal: 20, gap: 8 }}
-					>
-						{currentMunicipalities.map((municipality, index) => {
-							const isSelected = selectedMunicipality === municipality || (index === 0 && selectedMunicipality === 'all');
-							const municipalityId = index === 0 ? 'all' : municipality;
-							return (
-								<TouchableOpacity
-									key={municipality}
-									onPress={() => setSelectedMunicipality(municipalityId)}
-									activeOpacity={0.7}
-									className="px-4 py-2 rounded-xl"
-									style={{
-										backgroundColor: isSelected
-											? `${colors.primary.vivid}15`
-											: colors.surface.card,
-										borderWidth: 1.5,
-										borderColor: isSelected
-											? colors.primary.vivid
-											: isDark ? `${colors.primary.vivid}20` : colors.border.light,
-									}}
-								>
-									<Text
-										className="font-medium text-sm"
-										style={{
-											color: isSelected ? colors.primary.vivid : colors.text.secondary
-										}}
-									>
-										{municipality}
-									</Text>
-								</TouchableOpacity>
-							);
-						})}
-					</ScrollView>
-				</View>
-			)}
-
-			{/* Filtro de Preço */}
-			<View className="px-5 mb-6">
-				<Text className="text-sm font-bold mb-3" style={{ color: colors.text.secondary }}>
-					Faixa de Preço
-				</Text>
-				<View className="flex-row flex-wrap gap-2">
-					{priceRanges.map((range) => {
-						const isSelected = priceRange === range.id;
-						return (
-							<TouchableOpacity
-								key={range.id}
-								onPress={() => setPriceRange(range.id)}
-								activeOpacity={0.7}
-								className="px-4 py-2.5 rounded-xl flex-row items-center"
-								style={{
-									backgroundColor: isSelected
-										? `${colors.primary.vivid}15`
-										: colors.surface.card,
-									borderWidth: 1.5,
-									borderColor: isSelected
-										? colors.primary.vivid
-										: isDark ? `${colors.primary.vivid}20` : colors.border.light,
-								}}
-							>
-								<Ionicons
-									name="cash-outline"
-									size={16}
-									color={isSelected ? colors.primary.vivid : colors.text.secondary}
-								/>
-								<Text
-									className="text-sm font-medium ml-1.5"
-									style={{
-										color: isSelected ? colors.primary.vivid : colors.text.secondary
-									}}
-								>
-									{range.label}
-								</Text>
-							</TouchableOpacity>
-						);
-					})}
-				</View>
-			</View>
 
 			{/* Lista de Propriedades */}
 			<View className="px-5 pb-24">
@@ -410,15 +374,6 @@ export default function BookingsScreen() {
 					<Text className="text-xl font-bold" style={{ color: colors.text.primary }}>
 						{filteredProperties.length} {filteredProperties.length === 1 ? 'Propriedade' : 'Propriedades'}
 					</Text>
-					<TouchableOpacity className="flex-row items-center">
-						<Ionicons name="funnel-outline" size={18} color={colors.primary.vivid} />
-						<Text
-							className="font-semibold text-sm ml-1"
-							style={{ color: colors.primary.vivid }}
-						>
-							Mais Filtros
-						</Text>
-					</TouchableOpacity>
 				</View>
 
 				{filteredProperties.length > 0 ? (
@@ -574,23 +529,23 @@ export default function BookingsScreen() {
 									style={{ borderColor: isDark ? `${colors.primary.vivid}15` : colors.border.light }}
 								>
 									<View>
-										<View className="flex-row items-baseline">
-											<Text
-												className="text-2xl font-bold"
-												style={{ color: colors.primary.vivid }}
-											>
-												${property.price}
-											</Text>
-											<Text className="text-sm ml-1" style={{ color: colors.text.secondary }}>
-												/noite
-											</Text>
-										</View>
+											<View className="flex-row items-baseline">
+												<Text
+													className="text-2xl font-bold"
+													style={{ color: colors.primary.vivid }}
+												>
+													Kz {property.price}
+												</Text>
+												<Text className="text-sm ml-1" style={{ color: colors.text.secondary }}>
+													/noite
+												</Text>
+											</View>
 										<Text className="text-xs mt-0.5" style={{ color: colors.text.secondary }}>
 											Hospedado por {property.host}
 										</Text>
 									</View>
 									<TouchableOpacity
-										className="px-5 py-3 rounded-2xl flex-row items-center"
+										className="px-6 py-3 rounded-2xl flex-row items-center"
 										style={{
 											backgroundColor: colors.primary.vivid,
 											shadowColor: colors.primary.vivid,
@@ -600,8 +555,7 @@ export default function BookingsScreen() {
 											elevation: 4,
 										}}
 									>
-										<Text className="text-white font-bold mr-1">Reservar</Text>
-										<Ionicons name="arrow-forward" size={16} color="#FFFFFF" />
+										<Ionicons name="information-circle" size={16} color="#FFFFFF" />
 									</TouchableOpacity>
 								</View>
 							</View>

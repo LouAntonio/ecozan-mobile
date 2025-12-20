@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Image, TextInput } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Image, TextInput, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../contexts';
 
@@ -7,6 +7,7 @@ export default function ToursScreen() {
 	const { colors, isDark } = useTheme();
 	const [selectedCategory, setSelectedCategory] = useState('all');
 	const [selectedDuration, setSelectedDuration] = useState('all');
+	const [showFilters, setShowFilters] = useState(false);
 
 	// Categorias de tours
 	const categories = [
@@ -29,99 +30,99 @@ export default function ToursScreen() {
 	const tours = [
 		{
 			id: 1,
-			title: 'Safari Blue',
+			title: 'Ilha do Mussulo - Excursão',
 			category: 'water',
 			image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800',
 			duration: 'full',
 			durationText: 'Dia inteiro',
-			price: '65',
+			price: '35000',
 			rating: 4.9,
 			reviews: 234,
-			groupSize: '2-15',
-			highlights: ['Mergulho', 'Almoço incluso', 'Praia paradisíaca'],
-			description: 'Explore as águas cristalinas do arquipélago de Menai Bay',
-			location: 'Fumba',
-			included: ['Guia', 'Equipamento', 'Almoço', 'Frutas'],
+			groupSize: '2-20',
+			highlights: ['Praias', 'Almoço de marisco', 'Dunas'],
+			description: 'Passeio de barco até a Ilha do Mussulo com tempo para praia e almoço',
+			location: 'Ilha do Mussulo, Luanda',
+			included: ['Barco', 'Almoço', 'Guia', 'Bebidas'],
 		},
 		{
 			id: 2,
-			title: 'Stone Town Heritage Tour',
+			title: 'Centro Histórico de Luanda',
 			category: 'culture',
 			image: 'https://images.unsplash.com/photo-1609137144813-7d9921338f24?w=800',
 			duration: 'half',
 			durationText: '4 horas',
-			price: '30',
+			price: '15000',
 			rating: 4.8,
 			reviews: 189,
-			groupSize: '1-10',
-			highlights: ['Guia local', 'Mercado', 'Arquitetura histórica'],
-			description: 'Descubra a rica história e cultura de Stone Town',
-			location: 'Stone Town',
-			included: ['Guia especializado', 'Entrada museus', 'Degustação'],
+			groupSize: '1-12',
+			highlights: ['Museus', 'Mercado do Kinaxixi', 'Forte de São Miguel'],
+			description: 'Tour a pé pelo centro histórico de Luanda, museus e mercados tradicionais',
+			location: 'Luanda',
+			included: ['Guia', 'Entradas', 'Degustação'],
 		},
 		{
 			id: 3,
-			title: 'Spice Farm Tour',
+			title: 'Cabo Ledo - Surf e Praia',
 			category: 'nature',
 			image: 'https://images.unsplash.com/photo-1596040033229-a0b44b7ff4e9?w=800',
-			duration: 'half',
-			durationText: '3-4 horas',
-			price: '35',
+			duration: 'full',
+			durationText: 'Dia inteiro',
+			price: '20000',
 			rating: 4.7,
 			reviews: 156,
-			groupSize: '2-12',
-			highlights: ['Especiarias', 'Frutas tropicais', 'Almoço local'],
-			description: 'Conheça as famosas plantações de especiarias de Zanzibar',
-			location: 'Zona Rural',
-			included: ['Transporte', 'Guia', 'Degustação', 'Almoço'],
+			groupSize: '2-15',
+			highlights: ['Praia', 'Surf', 'Trilhas'],
+			description: 'Dia na costa do Lobito/Cabo Ledo com aulas de surf e tempo livre',
+			location: 'Cabo Ledo / Lobito',
+			included: ['Transporte', 'Aula de surf', 'Almoço'],
 		},
 		{
 			id: 4,
-			title: 'Mergulho com Golfinhos',
+			title: 'Observação de Golfinhos',
 			category: 'water',
 			image: 'https://images.unsplash.com/photo-1607153333879-c174d265f1d2?w=800',
 			duration: 'half',
 			durationText: '3-4 horas',
-			price: '55',
+			price: '18000',
 			rating: 4.9,
 			reviews: 312,
-			groupSize: '2-8',
+			groupSize: '2-12',
 			highlights: ['Golfinhos', 'Snorkel', 'Praia'],
-			description: 'Nade com golfinhos selvagens no oceano Índico',
-			location: 'Kizimkazi',
-			included: ['Barco', 'Equipamento snorkel', 'Guia', 'Frutas'],
+			description: 'Saída marítima para observação de golfinhos e snorkel na costa de Luanda',
+			location: 'Barra do Dande / Luanda',
+			included: ['Barco', 'Equipamento snorkel', 'Guia'],
 		},
 		{
 			id: 5,
-			title: 'Jozani Forest',
+			title: 'Kissama National Park',
 			category: 'nature',
 			image: 'https://images.unsplash.com/photo-1564760055775-d63b17a55c44?w=800',
-			duration: 'half',
-			durationText: '3 horas',
-			price: '40',
+			duration: 'full',
+			durationText: 'Dia inteiro',
+			price: '30000',
 			rating: 4.6,
 			reviews: 98,
-			groupSize: '2-15',
-			highlights: ['Macacos raros', 'Natureza', 'Trilhas'],
-			description: 'Explore a única floresta nativa de Zanzibar',
-			location: 'Jozani',
-			included: ['Entrada parque', 'Guia', 'Transporte'],
+			groupSize: '2-20',
+			highlights: ['Vida selvagem', 'Safári', 'Trilhas'],
+			description: 'Safari de dia inteiro no Parque Nacional Quiçama (Kissama)',
+			location: 'Quiçama / Luanda',
+			included: ['Transporte 4x4', 'Guia', 'Almoço'],
 		},
 		{
 			id: 6,
-			title: 'Prison Island Tour',
+			title: 'Ilha de Mussulo - Meio dia',
 			category: 'adventure',
 			image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800',
 			duration: 'half',
 			durationText: '3 horas',
-			price: '45',
+			price: '12000',
 			rating: 4.7,
 			reviews: 145,
 			groupSize: '2-20',
-			highlights: ['Tartarugas gigantes', 'História', 'Snorkel'],
-			description: 'Visite a histórica Ilha da Prisão e suas tartarugas',
-			location: 'Changuu Island',
-			included: ['Barco', 'Entrada', 'Guia', 'Snorkel'],
+			highlights: ['Praia', 'Passeio de barco', 'Relax'],
+			description: 'Meio dia na Ilha do Mussulo para banhos e atividades leves',
+			location: 'Ilha do Mussulo',
+			included: ['Barco', 'Entrada', 'Guia'],
 		},
 	];
 
@@ -184,10 +185,69 @@ export default function ToursScreen() {
 						className="flex-1 ml-3 text-base"
 						style={{ color: colors.text.primary }}
 					/>
-					<TouchableOpacity>
+					<TouchableOpacity onPress={() => setShowFilters(true)}>
 						<Ionicons name="options-outline" size={22} color={colors.primary.vivid} />
 					</TouchableOpacity>
 				</View>
+
+				{/* Modal de Filtros (acessível pelo botão de opções) */}
+				<Modal visible={showFilters} animationType="slide" transparent>
+					<View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'center', padding: 20 }}>
+						<View className="rounded-2xl p-4" style={{ backgroundColor: colors.surface.card }}>
+							<View className="flex-row justify-between items-center mb-3">
+								<Text className="text-lg font-bold" style={{ color: colors.text.primary }}>Filtros</Text>
+								<TouchableOpacity onPress={() => setShowFilters(false)}>
+									<Ionicons name="close" size={22} color={colors.text.secondary} />
+								</TouchableOpacity>
+							</View>
+							<Text className="text-sm font-semibold mb-2" style={{ color: colors.text.secondary }}>Categorias</Text>
+							<View className="flex-row flex-wrap mb-3">
+								{categories.map((cat) => {
+									const isSelected = selectedCategory === cat.id;
+									return (
+										<TouchableOpacity
+											key={cat.id}
+											onPress={() => setSelectedCategory(cat.id)}
+											activeOpacity={0.8}
+											className="px-4 py-2 rounded-xl mr-2 mb-2 flex-row items-center"
+											style={{ backgroundColor: isSelected ? colors.primary.vivid : colors.surface.card, borderWidth: 1.5, borderColor: isSelected ? colors.primary.vivid : colors.border.light }}
+										>
+											<Ionicons name={cat.icon} size={16} color={isSelected ? '#FFFFFF' : colors.text.primary} />
+											<Text className="ml-2" style={{ color: isSelected ? '#FFFFFF' : colors.text.primary }}>{cat.label}</Text>
+										</TouchableOpacity>
+									);
+								})}
+							</View>
+
+							<Text className="text-sm font-semibold mb-2" style={{ color: colors.text.secondary }}>Duração</Text>
+							<View className="flex-row flex-wrap">
+								{durations.map((dur) => {
+									const isSelected = selectedDuration === dur.id;
+									return (
+										<TouchableOpacity
+											key={dur.id}
+											onPress={() => setSelectedDuration(dur.id)}
+											activeOpacity={0.8}
+											className="px-4 py-2 rounded-xl mr-2 mb-2"
+											style={{ backgroundColor: isSelected ? colors.primary.vivid : colors.surface.card, borderWidth: 1.5, borderColor: isSelected ? colors.primary.vivid : colors.border.light }}
+										>
+											<Text style={{ color: isSelected ? '#FFFFFF' : colors.text.primary }}>{dur.label}</Text>
+										</TouchableOpacity>
+									);
+								})}
+							</View>
+
+							<View className="flex-row justify-end mt-4">
+								<TouchableOpacity onPress={() => { setSelectedCategory('all'); setSelectedDuration('all'); }}>
+									<Text style={{ color: colors.text.secondary }}>Limpar</Text>
+								</TouchableOpacity>
+								<TouchableOpacity onPress={() => setShowFilters(false)} className="ml-4 px-4 py-2 rounded-2xl" style={{ backgroundColor: colors.primary.vivid }}>
+									<Text style={{ color: '#FFFFFF', fontWeight: '700' }}>Aplicar</Text>
+								</TouchableOpacity>
+							</View>
+						</View>
+					</View>
+				</Modal>
 			</View>
 
 			{/* Banner promocional */}
@@ -233,110 +293,7 @@ export default function ToursScreen() {
 				</TouchableOpacity>
 			</View>
 
-			{/* Categorias */}
-			<View className="mb-5">
-				<View className="px-5 mb-3">
-					<Text
-						className="text-xl font-bold"
-						style={{ color: colors.text.primary }}
-					>
-						Categorias
-					</Text>
-				</View>
-				<ScrollView
-					horizontal
-					showsHorizontalScrollIndicator={false}
-					contentContainerStyle={{ paddingHorizontal: 20, gap: 10 }}
-				>
-					{categories.map((cat) => {
-						const isSelected = selectedCategory === cat.id;
-						return (
-							<TouchableOpacity
-								key={cat.id}
-								onPress={() => setSelectedCategory(cat.id)}
-								activeOpacity={0.7}
-								className="px-5 py-3 rounded-2xl flex-row items-center"
-								style={{
-									backgroundColor: isSelected
-										? colors.primary.vivid
-										: colors.surface.card,
-									borderWidth: 1.5,
-									borderColor: isSelected
-										? colors.primary.vivid
-										: isDark ? `${colors.primary.vivid}20` : colors.border.light,
-									shadowColor: isSelected ? colors.primary.vivid : 'transparent',
-									shadowOffset: { width: 0, height: 2 },
-									shadowOpacity: 0.3,
-									shadowRadius: 4,
-									elevation: isSelected ? 3 : 0,
-								}}
-							>
-								<Ionicons
-									name={cat.icon}
-									size={18}
-									color={isSelected ? '#FFFFFF' : colors.text.primary}
-								/>
-								<Text
-									className="font-semibold ml-2"
-									style={{
-										color: isSelected ? '#FFFFFF' : colors.text.primary
-									}}
-								>
-									{cat.label}
-								</Text>
-							</TouchableOpacity>
-						);
-					})}
-				</ScrollView>
-			</View>
 
-			{/* Filtro de duração */}
-			<View className="px-5 mb-6">
-				<Text
-					className="text-sm font-bold mb-3"
-					style={{ color: colors.text.secondary }}
-				>
-					Duração do Passeio
-				</Text>
-				<View className="flex-row flex-wrap gap-2">
-					{durations.map((dur) => {
-						const isSelected = selectedDuration === dur.id;
-						return (
-							<TouchableOpacity
-								key={dur.id}
-								onPress={() => setSelectedDuration(dur.id)}
-								activeOpacity={0.7}
-								className="px-4 py-2.5 rounded-xl flex-row items-center"
-								style={{
-									borderWidth: 1.5,
-									borderColor: isSelected
-										? colors.primary.vivid
-										: isDark ? `${colors.primary.vivid}20` : colors.border.light,
-									backgroundColor: isSelected
-										? `${colors.primary.vivid}15`
-										: colors.surface.card,
-								}}
-							>
-								<Ionicons
-									name={dur.icon}
-									size={16}
-									color={isSelected ? colors.primary.vivid : colors.text.secondary}
-								/>
-								<Text
-									className="text-sm font-medium ml-1.5"
-									style={{
-										color: isSelected
-											? colors.primary.vivid
-											: colors.text.secondary,
-									}}
-								>
-									{dur.label}
-								</Text>
-							</TouchableOpacity>
-						);
-					})}
-				</View>
-			</View>
 
 			{/* Tours em destaque */}
 			{selectedCategory === 'all' && selectedDuration === 'all' && (
@@ -351,15 +308,6 @@ export default function ToursScreen() {
 								Mais Populares
 							</Text>
 						</View>
-						<TouchableOpacity className="flex-row items-center">
-							<Text
-								className="font-semibold text-sm mr-1"
-								style={{ color: colors.primary.vivid }}
-							>
-								Ver todos
-							</Text>
-							<Ionicons name="arrow-forward" size={14} color={colors.primary.vivid} />
-						</TouchableOpacity>
 					</View>
 
 					<ScrollView
@@ -455,14 +403,9 @@ export default function ToursScreen() {
 													className="text-2xl font-bold"
 													style={{ color: colors.primary.vivid }}
 												>
-													${tour.price}
+													Kz {tour.price}
 												</Text>
-												<Text
-													className="text-xs ml-1"
-													style={{ color: colors.text.secondary }}
-												>
-													/pessoa
-												</Text>
+												<Ionicons name="person" size={14} color={colors.text.secondary} style={{ marginLeft: 6 }} />
 											</View>
 										</View>
 										<TouchableOpacity
@@ -476,10 +419,7 @@ export default function ToursScreen() {
 												elevation: 4,
 											}}
 										>
-											<Text className="text-white font-bold text-sm mr-1">
-												Ver Mais
-											</Text>
-											<Ionicons name="arrow-forward" size={14} color="#FFFFFF" />
+											<Ionicons name="information-circle" size={18} color="#FFFFFF" />
 										</TouchableOpacity>
 									</View>
 								</View>
@@ -500,15 +440,6 @@ export default function ToursScreen() {
 							? '1 Passeio Disponível'
 							: `${filteredTours.length} Passeios Disponíveis`}
 					</Text>
-					<TouchableOpacity className="flex-row items-center">
-						<Ionicons name="funnel-outline" size={18} color={colors.primary.vivid} />
-						<Text
-							className="font-semibold text-sm ml-1"
-							style={{ color: colors.primary.vivid }}
-						>
-							Filtrar
-						</Text>
-					</TouchableOpacity>
 				</View>
 
 				{filteredTours.map((tour) => (
@@ -604,28 +535,21 @@ export default function ToursScreen() {
 										>
 											{tour.durationText}
 										</Text>
-										<View className="flex-row items-baseline">
-											<Text
-												className="text-lg font-bold"
-												style={{ color: colors.primary.vivid }}
-											>
-												${tour.price}
-											</Text>
-											<Text
-												className="text-[10px] ml-0.5"
-												style={{ color: colors.text.secondary }}
-											>
-												/pessoa
-											</Text>
-										</View>
+											<View className="flex-row items-baseline">
+												<Text
+													className="text-lg font-bold"
+													style={{ color: colors.primary.vivid }}
+												>
+													Kz {tour.price}
+												</Text>
+												<Ionicons name="person" size={12} color={colors.text.secondary} style={{ marginLeft: 6 }} />
+											</View>
 									</View>
 									<TouchableOpacity
 									className="px-4 py-2 rounded-xl"
 									style={{ backgroundColor: colors.primary.vivid }}
 								>
-									<Text className="text-white font-bold text-xs">
-										Reservar
-									</Text>
+									<Ionicons name="information-circle" size={16} color="#FFFFFF" />
 								</TouchableOpacity>
 							</View>
 						</View>

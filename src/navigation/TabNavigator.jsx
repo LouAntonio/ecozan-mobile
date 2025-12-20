@@ -16,15 +16,15 @@ const Tab = createBottomTabNavigator();
 const tabConfig = {
 	discover: {
 		name: 'Discover',
-		label: 'Descobrir',
+		label: 'Explorar',
 		iconFocused: 'compass',
 		iconUnfocused: 'compass-outline',
 	},
 	tours: {
 		name: 'Tours',
-		label: 'Passeios',
-		iconFocused: 'boat',
-		iconUnfocused: 'boat-outline',
+		label: 'Tours',
+		iconFocused: 'map',
+		iconUnfocused: 'map-outline',
 	},
 	transport: {
 		name: 'Transport',
@@ -34,9 +34,9 @@ const tabConfig = {
 	},
 	bookings: {
 		name: 'Bookings',
-		label: 'Reservas',
-		iconFocused: 'calendar',
-		iconUnfocused: 'calendar-outline',
+		label: 'Hospedagem',
+		iconFocused: 'bed',
+		iconUnfocused: 'bed-outline',
 	},
 	menu: {
 		name: 'Menu',

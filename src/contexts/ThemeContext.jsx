@@ -36,6 +36,7 @@ export const themes = {
 		text: {
 			primary: '#1A1A1A',
 			secondary: '#6B7280',
+			tertiary: '#9CA3AF',
 			muted: '#9CA3AF',
 			inverse: '#F9F9F9',
 		},
@@ -83,6 +84,7 @@ export const themes = {
 		text: {
 			primary: '#F9F9F9',
 			secondary: '#B3B3B3',
+			tertiary: '#9CA3AF',
 			muted: '#808080',
 			inverse: '#121212',
 		},

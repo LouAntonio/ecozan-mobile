@@ -3,8 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import { ThemeProvider, useTheme } from './src/contexts';
-import { SplashScreen } from './src/screens';
-import { OnboardingScreen } from './src/screens';
+import { SplashScreen, OnboardingScreen, AuthScreen } from './src/screens';
 import { TabNavigator } from './src/navigation';
 
 function MainApp() {
@@ -39,6 +38,7 @@ function MainApp() {
 export default function App() {
 	const [showSplash, setShowSplash] = useState(true);
 	const [showOnboarding, setShowOnboarding] = useState(false);
+	const [showAuth, setShowAuth] = useState(false);
 
 	function handleSplashFinish() {
 		setShowOnboarding(true);
@@ -47,6 +47,7 @@ export default function App() {
 
 	function handleOnboardingDone() {
 		setShowOnboarding(false);
+		setShowAuth(true);
 	}
 
 	return (
@@ -56,6 +57,8 @@ export default function App() {
 					<SplashScreen onFinish={handleSplashFinish} />
 				) : showOnboarding ? (
 					<OnboardingScreen onDone={handleOnboardingDone} />
+				) : showAuth ? (
+					<AuthScreen onAuthSuccess={() => setShowAuth(false)} />
 				) : (
 					<MainApp />
 				)}

@@ -338,7 +338,7 @@ export default function OnboardingScreen({ onDone }) {
 					}}
 				>
 					<Text className="text-white font-bold text-lg mr-2">
-						{index < pages.length - 1 ? 'Próximo' : 'Criar Conta'}
+						{index < pages.length - 1 ? 'Próximo' : 'Começar'}
 					</Text>
 					<Ionicons 
 						name={index < pages.length - 1 ? 'arrow-forward' : 'checkmark-circle'} 

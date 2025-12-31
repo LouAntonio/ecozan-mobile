@@ -1,8 +1,10 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, Image, Alert, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../contexts';
 import spacing from '../../theme/spacing';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import apiRequest from '../../scripts/requests';
 
 export default function AuthScreen({ onAuthSuccess }) {
 	const { colors, isDark } = useTheme();
@@ -10,6 +12,7 @@ export default function AuthScreen({ onAuthSuccess }) {
 	const [signupStep, setSignupStep] = useState(1); // 1: email, 2: otp, 3: details
 	const [showPassword, setShowPassword] = useState(false);
 	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+	const [loading, setLoading] = useState(false);
 
 	// Form state
 	const [email, setEmail] = useState('');
@@ -17,8 +20,6 @@ export default function AuthScreen({ onAuthSuccess }) {
 	const [confirmPassword, setConfirmPassword] = useState('');
 	const [firstName, setFirstName] = useState('');
 	const [lastName, setLastName] = useState('');
-	const [gender, setGender] = useState(''); // 'male' | 'female' | 'other'
-	const [birthDate, setBirthDate] = useState('');
 	const [otp, setOtp] = useState(['', '', '', '', '', '']);
 	
 	// OTP refs
@@ -31,26 +32,52 @@ export default function AuthScreen({ onAuthSuccess }) {
 		useRef(null),
 	];
 
-	function handlePrimaryAction() {
-		if (mode === 'login') {
-			onAuthSuccess && onAuthSuccess();
-		} else if (mode === 'signup') {
-			if (signupStep === 1) {
-				// Validar email e enviar OTP
-				// Simulação: apenas avançar para próximo step
-				setSignupStep(2);
-			} else if (signupStep === 2) {
-				// Verificar OTP
-				setSignupStep(3);
+	async function handlePrimaryAction() {
+		setLoading(true);
+		try {
+			if (mode === 'login') {
+				const res = await apiRequest('/users/login', 'POST', { email, password });
+				if (res && res.success) {
+					if (res.token) await AsyncStorage.setItem('token', res.token);
+					onAuthSuccess && onAuthSuccess(res.user || null);
+				} else {
+					Alert.alert('Erro', res?.msg || 'Falha no login');
+				}
+			} else if (mode === 'signup') {
+				if (signupStep === 1) {
+					if (!email) return Alert.alert('Erro', 'Email é obrigatório');
+					const res = await apiRequest('/users/check-email', 'POST', { email });
+					if (res && res.success) {
+						setSignupStep(2);
+					} else {
+						Alert.alert('Erro', res?.msg || 'Email não disponível');
+					}
+				} else if (signupStep === 2) {
+					const code = otp.join('');
+					if (code.length !== 6) return Alert.alert('Erro', 'Digite o código de 6 dígitos');
+					// OTP permanece fake — apenas avançar
+					setSignupStep(3);
 				} else if (signupStep === 3) {
-					// Criar conta -> após cadastro, redirecionar para login
-					setSignupStep(1);
-					setMode('login');
-					setPassword('');
-					setConfirmPassword('');
+					if (!firstName || !lastName || !password) return Alert.alert('Erro', 'Preencha todos os campos');
+					if (password !== confirmPassword) return Alert.alert('Erro', 'As senhas não coincidem');
+					const payload = { name: firstName, surname: lastName, email, password };
+					const res = await apiRequest('/users/complete-registration', 'POST', payload);
+					if (res && res.success) {
+						Alert.alert('Sucesso', 'Conta criada com sucesso. Faça login.');
+						resetSignup();
+						setMode('login');
+					} else {
+						Alert.alert('Erro', res?.msg || 'Erro ao criar conta');
+					}
+				}
+			} else if (mode === 'forgot') {
+				Alert.alert('Recuperação', 'Link de recuperação enviado (simulação).');
+				setMode('login');
 			}
-		} else if (mode === 'forgot') {
-			setMode('login');
+		} catch (err) {
+			Alert.alert('Erro', 'Erro de rede ou servidor');
+		} finally {
+			setLoading(false);
 		}
 	}
 
@@ -81,23 +108,10 @@ export default function AuthScreen({ onAuthSuccess }) {
 		setOtp(['', '', '', '', '', '']);
 		setFirstName('');
 		setLastName('');
-		setGender('');
-		setBirthDate('');
 		setPassword('');
 		setConfirmPassword('');
 	}
 
-	function formatBirthDateInput(value) {
-		// remove non-digits
-		const digits = value.replace(/\D/g, '').slice(0, 8);
-		let formatted = digits;
-		if (digits.length > 4) {
-			formatted = digits.slice(0,2) + '/' + digits.slice(2,4) + '/' + digits.slice(4);
-		} else if (digits.length > 2) {
-			formatted = digits.slice(0,2) + '/' + digits.slice(2);
-		}
-		setBirthDate(formatted);
-	}
 
 	const getModeConfig = () => {
 		if (mode === 'signup') {
@@ -146,11 +160,6 @@ export default function AuthScreen({ onAuthSuccess }) {
 	};
 
 	const config = getModeConfig();
-	const genders = [
-		{ id: 'male', label: 'Masculino', icon: 'male' },
-		{ id: 'female', label: 'Feminino', icon: 'female' },
-		{ id: 'other', label: 'Outro', icon: 'male-female' },
-	];
 
 	return (
 		<KeyboardAvoidingView
@@ -439,54 +448,7 @@ export default function AuthScreen({ onAuthSuccess }) {
 								</View>
 							</View>
 
-							<View className="mb-4">
-								<View className="flex-row gap-2">
-									{genders.map((g) => (
-										<TouchableOpacity
-											key={g.id}
-											onPress={() => setGender(g.id)}
-											className="flex-1 flex-row items-center justify-center rounded-2xl py-3"
-											style={{
-												backgroundColor: gender === g.id ? config.iconColor + '20' : colors.background.primary,
-												borderWidth: 1.5,
-												borderColor: gender === g.id ? config.iconColor : (isDark ? `${colors.primary.vivid}20` : colors.border.light),
-											}}
-											activeOpacity={0.7}
-										>
-											<Ionicons name={g.icon} size={18} color={gender === g.id ? config.iconColor : colors.text.secondary} />
-											<Text
-												className="text-xs font-semibold ml-1"
-												style={{ color: gender === g.id ? config.iconColor : colors.text.secondary }}
-											>
-												{g.label}
-											</Text>
-										</TouchableOpacity>
-									))}
-								</View>
-							</View>
 
-							<View className="mb-4">
-								<View
-									className="flex-row items-center rounded-2xl px-4 py-4"
-									style={{
-										backgroundColor: colors.background.primary,
-										borderWidth: 1.5,
-										borderColor: isDark ? `${colors.primary.vivid}20` : colors.border.light,
-									}}
-								>
-									<Ionicons name="calendar-outline" size={20} color={colors.text.secondary} />
-									<TextInput
-										placeholder="29/01/2000"
-										placeholderTextColor={colors.text.tertiary}
-										value={birthDate}
-										onChangeText={formatBirthDateInput}
-										keyboardType="numeric"
-										maxLength={10}
-										className="flex-1 ml-3 text-base"
-										style={{ color: colors.text.primary }}
-									/>
-								</View>
-							</View>
 
 							<View className="mb-4">
 								<View
@@ -601,11 +563,13 @@ export default function AuthScreen({ onAuthSuccess }) {
 
 					{/* Botão Principal */}
 					<TouchableOpacity
-						onPress={handlePrimaryAction}
-						activeOpacity={0.9}
+						onPress={loading ? null : handlePrimaryAction}
+						disabled={loading}
+						activeOpacity={loading ? 1 : 0.9}
 						className="rounded-2xl py-4 flex-row items-center justify-center mb-4"
 						style={{
 							backgroundColor: config.iconColor,
+							opacity: loading ? 0.85 : 1,
 							shadowColor: config.iconColor,
 							shadowOffset: { width: 0, height: 6 },
 							shadowOpacity: 0.4,
@@ -613,8 +577,14 @@ export default function AuthScreen({ onAuthSuccess }) {
 							elevation: 8,
 						}}
 					>
-						<Text className="text-white font-bold text-lg mr-2">{config.buttonText}</Text>
-						<Ionicons name="arrow-forward" size={20} color="#FFFFFF" />
+						{loading ? (
+							<ActivityIndicator size="small" color="#FFFFFF" />
+						) : (
+							<>
+								<Text className="text-white font-bold text-lg mr-2">{config.buttonText}</Text>
+								<Ionicons name="arrow-forward" size={20} color="#FFFFFF" />
+							</>
+						)}
 					</TouchableOpacity>
 
 					{/* Switch entre modos */}
@@ -690,10 +660,27 @@ export default function AuthScreen({ onAuthSuccess }) {
 				{/* Footer */}
 				<View className="px-6 py-6">
 					<Text className="text-center text-xs leading-5" style={{ color: colors.text.tertiary }}>
-						🌿 Ecozan - Turismo Sustentável
+						Ecozan
 					</Text>
 				</View>
 			</ScrollView>
+
+			{loading && (
+				<View
+					style={{
+						position: 'absolute',
+						top: 0,
+						left: 0,
+						right: 0,
+						bottom: 0,
+						justifyContent: 'center',
+						alignItems: 'center',
+						backgroundColor: 'rgba(0,0,0,0.15)'
+					}}
+				>
+					<ActivityIndicator size="large" color={config.iconColor} />
+				</View>
+			)}
 		</KeyboardAvoidingView>
 	);
 }

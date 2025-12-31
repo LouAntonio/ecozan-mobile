@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../contexts';
+import apiRequest from '../../scripts/requests';
 
 export default function DiscoverScreen() {
 	const { colors, isDark } = useTheme();
@@ -15,39 +16,60 @@ export default function DiscoverScreen() {
 		{ id: 'packages', label: 'Pacotes Turísticos', icon: 'map-outline' },
 	];
 
-	// Hospedagens
-	const stays = [
-		{
-			id: 1,
-			category: 'stays',
-			title: 'Casa do Mar - Luanda',
-			image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800',
-			price: '15000',
-			rating: 4.9,
-			location: 'Ilha do Mussulo, Luanda',
-			amenities: ['Wi-Fi', 'Piscina', 'Vista Mar'],
-		},
-		{
-			id: 2,
-			category: 'stays',
-			title: 'Resort do Mussulo',
-			image: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800',
-			price: '35000',
-			rating: 4.8,
-			location: 'Mussulo, Luanda',
-			amenities: ['All Inclusive', 'Spa', 'Praia Privada'],
-		},
-		{
-			id: 3,
-			category: 'stays',
-			title: 'Hotel Centro Luanda',
-			image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
-			price: '12000',
-			rating: 4.7,
-			location: 'Avenida 17 de Setembro, Luanda',
-			amenities: ['Centro Histórico', 'Café da Manhã', 'Terraço'],
-		},
-	];
+	// Hospedagens (serão carregadas do backend)
+	const [hosts, setHosts] = useState([]);
+	const [bnbList, setBnbList] = useState([]);
+	const [provinces, setProvinces] = useState([]);
+	const [loadingStays, setLoadingStays] = useState(false);
+	const [tours, setTours] = useState([]);
+	const [loadingTours, setLoadingTours] = useState(false);
+
+	useEffect(() => {
+		let mounted = true;
+		const loadData = async () => {
+			setLoadingStays(true);
+			try {
+				const [hostsRes, bnbRes, provincesRes] = await Promise.all([
+					apiRequest('/hosts'),
+					apiRequest('/bnb'),
+					apiRequest('/provinces'),
+				]);
+
+				if (!mounted) return;
+
+				setHosts(Array.isArray(hostsRes?.data) ? hostsRes.data : []);
+				setBnbList(Array.isArray(bnbRes?.data) ? bnbRes.data : []);
+				setProvinces(Array.isArray(provincesRes?.data) ? provincesRes.data : []);
+			} catch (err) {
+				console.warn('Erro carregando hospedagens:', err);
+			} finally {
+				if (mounted) setLoadingStays(false);
+			}
+		};
+
+		loadData();
+		return () => { mounted = false; };
+	}, []);
+
+	// Carrega tours da API
+	useEffect(() => {
+		let mounted = true;
+		const loadTours = async () => {
+			setLoadingTours(true);
+			try {
+				const toursRes = await apiRequest('/tours');
+				if (!mounted) return;
+				setTours(Array.isArray(toursRes?.data) ? toursRes.data : []);
+			} catch (err) {
+				console.warn('Erro carregando tours:', err);
+			} finally {
+				if (mounted) setLoadingTours(false);
+			}
+		};
+
+		loadTours();
+		return () => { mounted = false; };
+	}, []);
 
 	// Transportes
 	const transports = [
@@ -83,8 +105,8 @@ export default function DiscoverScreen() {
 		},
 	];
 
-	// Pacotes
-	const packages = [
+	// Pacotes estáticos (fallback)
+	const staticPackages = [
 		{
 			id: 1,
 			category: 'packages',
@@ -123,29 +145,119 @@ export default function DiscoverScreen() {
 		},
 	];
 
-	// Experiências populares (linhas)
-	const experiences = [
-		{ id: 1, title: 'Passeio à Ilha do Mussulo', image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800', color: '#3B82F6', description: 'Praias e dunas perto de Luanda' },
-		{ id: 2, title: 'Mercado Popular', image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800', color: '#10B981', description: 'Feiras e artesanato local' },
-		{ id: 3, title: 'Museu Nacional de História', image: 'https://images.unsplash.com/photo-1511988617509-a57c8a288659?w=800', color: '#F59E0B', description: 'Património e cultura angolana' },
-		{ id: 5, title: 'Parque Natural Iona', image: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800', color: '#8B5CF6', description: 'Vida selvagem e paisagens únicas' },
-		{ id: 6, title: 'Praia da Barra do Dande', image: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800', color: '#06B6D4', description: 'Sol e mar no Namibe' },
-	];
+	// Mapeador de tours da API para o formato da UI
+	const mapTourToItem = (tour) => {
+		let gallery = [];
+		if (tour.galery) {
+			try {
+				gallery = typeof tour.galery === 'string' ? JSON.parse(tour.galery) : tour.galery;
+			} catch (e) {
+				gallery = [];
+			}
+		}
+
+		const provinceObj = provinces.find((p) => p.id === tour.location);
+
+		return {
+			id: tour.id,
+			category: 'packages',
+			title: tour.name,
+			description: tour.duration || tour.description || '',
+			image: tour.image || (gallery && gallery[0]) || null,
+			price: tour.price,
+			discount: null,
+			rating: tour.eval ?? tour.evals ?? null,
+			location: provinceObj?.name || String(tour.location) || '',
+			features: [],
+			_raw: { tour, gallery },
+		};
+	};
+
+	// Experiências populares: derive 3 aleatórias dos pacotes (API ou fallback estático)
+	const getRandomSlice = (arr, n) => {
+		if (!Array.isArray(arr) || arr.length === 0) return [];
+		const copy = [...arr];
+		for (let i = copy.length - 1; i > 0; i--) {
+			const j = Math.floor(Math.random() * (i + 1));
+			[copy[i], copy[j]] = [copy[j], copy[i]];
+		}
+		return copy.slice(0, n);
+	};
+
+	const popularExperiences = (() => {
+		const apiPackages = Array.isArray(tours) && tours.length ? tours.map(mapTourToItem) : [];
+		const source = apiPackages.length ? apiPackages : staticPackages;
+		const chosen = getRandomSlice(source, 3);
+		return chosen.map((it, idx) => ({
+			id: `${it.category || 'pkg'}-${it.id}-${idx}`,
+			title: it.title,
+			image: it.image,
+			color: '#3B82F6',
+			description: it.description || it.location || '',
+			_item: it,
+		}));
+	})();
 	// Função para filtrar itens
+	const mapBnbToItem = (bnb) => {
+		// resolve host and province name
+		const hostId = bnb.host || bnb.hosts?.id || null;
+		const hostObj = hosts.find((h) => h.id === hostId) || bnb.hosts || null;
+		const provinceObj = hostObj ? provinces.find((p) => p.id === hostObj.location) : null;
+
+		// parse gallery if string
+		let gallery = [];
+		if (bnb.gallery) {
+			try {
+				gallery = typeof bnb.gallery === 'string' ? JSON.parse(bnb.gallery) : bnb.gallery;
+			} catch (e) {
+				gallery = [];
+			}
+		}
+
+		return {
+			id: bnb.id,
+			category: 'stays',
+			title: bnb.name,
+			image: bnb.image || (gallery && gallery[0]) || null,
+			price: bnb.price,
+			rating: bnb.evals,
+			location: provinceObj?.name || hostObj?.name || bnb.host_name || '',
+			amenities: Array.isArray(bnb.amenities) ? bnb.amenities : [],
+			description: bnb.description,
+			_raw: { bnb, hostObj, gallery },
+		};
+	};
+
 	const getFilteredItems = () => {
+		const staysMapped = bnbList.map(mapBnbToItem);
+
 		if (selectedCategory === 'all') {
-			// Mostrar 1 de cada categoria
-			return [
-				stays[0],
-				transports[0],
-				packages[0],
-			];
+			const result = [];
+			const seen = new Set();
+
+			const pushIfUnique = (it) => {
+				if (!it) return;
+				const k = `${it.category}-${it.id}`;
+				if (!seen.has(k)) {
+					seen.add(k);
+					result.push(it);
+				}
+			};
+
+			// Prioritize API tours if available, else static packages
+			const apiPackages = tours.map(mapTourToItem);
+			pushIfUnique(staysMapped[0]);
+			pushIfUnique(transports[0]);
+			pushIfUnique(apiPackages[0] || staticPackages[0]);
+
+			return result;
 		} else if (selectedCategory === 'stays') {
-			return stays;
+			return staysMapped;
 		} else if (selectedCategory === 'transport') {
 			return transports;
 		} else if (selectedCategory === 'packages') {
-			return packages;
+			const apiPackages = tours.map(mapTourToItem);
+			return apiPackages.length ? apiPackages : staticPackages;
 		}
 		return [];
 	};
@@ -462,7 +574,7 @@ export default function DiscoverScreen() {
 					Atividades imperdíveis em Angola
 				</Text>
 				
-				{experiences.map((exp) => (
+				{popularExperiences.map((exp) => (
 					<TouchableOpacity
 						key={exp.id}
 						activeOpacity={0.7}

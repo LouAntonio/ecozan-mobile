@@ -9,7 +9,7 @@ import { Header } from '../components';
 import { DiscoverScreen } from '../screens/discover';
 import { ToursScreen, TourDetailsScreen } from '../screens/tours';
 import { TransportScreen } from '../screens/transport';
-import { BookingsScreen, HostDetailsScreen } from '../screens/bookings';
+import { BookingsScreen, HostDetailsScreen, BnbDetailsScreen } from '../screens/bookings';
 import { MenuScreen } from '../screens/menu';
 
 const Tab = createBottomTabNavigator();
@@ -166,6 +166,7 @@ function BookingsStackNavigator() {
 		<Stack.Navigator screenOptions={{ headerShown: false }}>
 			<Stack.Screen name="BookingsList" component={BookingsScreen} />
 			<Stack.Screen name="HostDetails" component={HostDetailsScreen} />
+			<Stack.Screen name="BnbDetails" component={BnbDetailsScreen} />
 		</Stack.Navigator>
 	);
 }

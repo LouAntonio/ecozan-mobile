@@ -96,7 +96,7 @@ export default function HostDetailsScreen({ route, navigation }) {
 	}
 
 	return (
-		<View className="flex-1" style={{ backgroundColor: colors.background.primary }}>
+		<View className="flex-1 mb-16" style={{ backgroundColor: colors.background.primary }}>
 			{/* Header com imagem */}
 			<View className="relative">
 				<Image 
@@ -269,6 +269,7 @@ export default function HostDetailsScreen({ route, navigation }) {
 							bnbs.map((bnb, index) => (
 								<TouchableOpacity
 									key={bnb.id}
+									onPress={() => navigation.navigate('BnbDetails', { bnbId: bnb.id })}
 									activeOpacity={0.8}
 									className="rounded-2xl overflow-hidden"
 									style={{

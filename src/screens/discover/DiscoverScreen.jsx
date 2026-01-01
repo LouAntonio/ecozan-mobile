@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../contexts';
+import { useNavigation } from '@react-navigation/native';
 import apiRequest from '../../scripts/requests';
 
 export default function DiscoverScreen() {
 	const { colors, isDark } = useTheme();
+	const navigation = useNavigation();
 	const [selectedCategory, setSelectedCategory] = useState('all');
 
 	// Dados das categorias (removido 'tours')
@@ -375,6 +377,7 @@ export default function DiscoverScreen() {
 				>
 					{filteredItems.map((item) => (
 						<TouchableOpacity
+							onPress={() => navigation.navigate('Tours', { screen: 'TourDetails', params: { tourId: item.id } })}
 							key={`${item.category}-${item.id}`}
 							activeOpacity={0.9}
 							className="rounded-3xl overflow-hidden"
@@ -576,6 +579,7 @@ export default function DiscoverScreen() {
 				
 				{popularExperiences.map((exp) => (
 					<TouchableOpacity
+						onPress={() => navigation.navigate('Tours', { screen: 'TourDetails', params: { tourId: exp._item?.id } })}
 						key={exp.id}
 						activeOpacity={0.7}
 						className="rounded-2xl mb-3 flex-row items-center overflow-hidden"

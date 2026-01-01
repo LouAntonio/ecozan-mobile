@@ -1,8 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 async function apiRequest(endpoint, method = 'GET', data = null, headers = {}) {
-	// const baseUrl = 'https://vakwetoweya-back.onrender.com';
-	const baseUrl = 'http://192.168.18.5:2022';
+	const baseUrl = 'https://ecozan-back.onrender.com';
+	// const baseUrl = 'http://192.168.18.5:2022';
 
 	const token = await AsyncStorage.getItem('token');
 

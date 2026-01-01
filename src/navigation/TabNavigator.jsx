@@ -9,7 +9,7 @@ import { Header } from '../components';
 import { DiscoverScreen } from '../screens/discover';
 import { ToursScreen, TourDetailsScreen } from '../screens/tours';
 import { TransportScreen } from '../screens/transport';
-import { BookingsScreen } from '../screens/bookings';
+import { BookingsScreen, HostDetailsScreen } from '../screens/bookings';
 import { MenuScreen } from '../screens/menu';
 
 const Tab = createBottomTabNavigator();
@@ -161,6 +161,15 @@ function ToursStackNavigator() {
 	);
 }
 
+function BookingsStackNavigator() {
+	return (
+		<Stack.Navigator screenOptions={{ headerShown: false }}>
+			<Stack.Screen name="BookingsList" component={BookingsScreen} />
+			<Stack.Screen name="HostDetails" component={HostDetailsScreen} />
+		</Stack.Navigator>
+	);
+}
+
 export default function TabNavigator() {
 	const { colors, isDark } = useTheme();
 
@@ -252,7 +261,7 @@ export default function TabNavigator() {
 			>
 				{() => (
 					<ScreenWrapper>
-						<BookingsScreen />
+						<BookingsStackNavigator />
 					</ScreenWrapper>
 				)}
 			</Tab.Screen>

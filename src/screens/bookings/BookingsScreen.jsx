@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../contexts';
 import apiRequest from '../../scripts/requests';
 
-export default function BookingsScreen() {
+export default function BookingsScreen({ navigation }) {
 	const { colors, isDark } = useTheme();
 	const [searchQuery, setSearchQuery] = useState('');
 	const [selectedProvince, setSelectedProvince] = useState('all');
@@ -329,6 +329,7 @@ export default function BookingsScreen() {
 
 								{/* Botão de ação */}
 								<TouchableOpacity
+									onPress={() => navigation.navigate('HostDetails', { hostId: host.id })}
 									className="px-4 py-3 rounded-2xl flex-row items-center justify-center"
 									style={{
 										backgroundColor: colors.primary.vivid,

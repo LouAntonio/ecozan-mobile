@@ -377,7 +377,15 @@ export default function DiscoverScreen() {
 				>
 					{filteredItems.map((item) => (
 						<TouchableOpacity
-							onPress={() => navigation.navigate('Tours', { screen: 'TourDetails', params: { tourId: item.id } })}
+							onPress={() => {
+								if (item.category === 'packages') {
+									navigation.navigate('Tours', { screen: 'TourDetails', params: { tourId: item.id } });
+								} else if (item.category === 'stays') {
+									navigation.navigate('Bookings', { screen: 'BnbDetails', params: { bnbId: item.id } });
+								} else if (item.category === 'transport') {
+									navigation.navigate('Transport');
+								}
+							}}
 							key={`${item.category}-${item.id}`}
 							activeOpacity={0.9}
 							className="rounded-3xl overflow-hidden"
@@ -579,7 +587,11 @@ export default function DiscoverScreen() {
 				
 				{popularExperiences.map((exp) => (
 					<TouchableOpacity
-						onPress={() => navigation.navigate('Tours', { screen: 'TourDetails', params: { tourId: exp._item?.id } })}
+						onPress={() => {
+							if (exp._item?.category === 'packages') {
+								navigation.navigate('Tours', { screen: 'TourDetails', params: { tourId: exp._item?.id } });
+							}
+						}}
 						key={exp.id}
 						activeOpacity={0.7}
 						className="rounded-2xl mb-3 flex-row items-center overflow-hidden"

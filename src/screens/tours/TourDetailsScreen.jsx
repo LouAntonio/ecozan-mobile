@@ -101,7 +101,7 @@ export default function TourDetailsScreen({ route, navigation }) {
 				}}
 			>
 				<TouchableOpacity
-					onPress={() => navigation.goBack()}
+					onPress={() => navigation.navigate('ToursList')}
 					className="w-10 h-10 rounded-full items-center justify-center"
 					style={{
 						backgroundColor: 'rgba(0, 0, 0, 0.5)',

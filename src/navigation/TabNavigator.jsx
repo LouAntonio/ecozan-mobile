@@ -1,17 +1,19 @@
 import React from 'react';
 import { View, Platform, Animated, Easing } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../contexts';
 import { Header } from '../components';
 
 import { DiscoverScreen } from '../screens/discover';
-import { ToursScreen } from '../screens/tours';
+import { ToursScreen, TourDetailsScreen } from '../screens/tours';
 import { TransportScreen } from '../screens/transport';
 import { BookingsScreen } from '../screens/bookings';
 import { MenuScreen } from '../screens/menu';
 
 const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
 
 const tabConfig = {
 	discover: {
@@ -150,6 +152,15 @@ function TabBarIcon({ focused, color, size, iconName, isDark }) {
 	);
 }
 
+function ToursStackNavigator() {
+	return (
+		<Stack.Navigator screenOptions={{ headerShown: false }}>
+			<Stack.Screen name="ToursList" component={ToursScreen} />
+			<Stack.Screen name="TourDetails" component={TourDetailsScreen} />
+		</Stack.Navigator>
+	);
+}
+
 export default function TabNavigator() {
 	const { colors, isDark } = useTheme();
 
@@ -219,7 +230,7 @@ export default function TabNavigator() {
 			>
 				{() => (
 					<ScreenWrapper>
-						<ToursScreen />
+						<ToursStackNavigator />
 					</ScreenWrapper>
 				)}
 			</Tab.Screen>

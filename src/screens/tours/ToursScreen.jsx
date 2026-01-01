@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image, TextInput, Modal, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../contexts';
+import { useNavigation } from '@react-navigation/native';
 import apiRequest from '../../scripts/requests';
 
 export default function ToursScreen() {
 	const { colors, isDark } = useTheme();
+	const navigation = useNavigation();
 	const [selectedCategory, setSelectedCategory] = useState('all');
 	const [selectedDuration, setSelectedDuration] = useState('all');
 	const [showFilters, setShowFilters] = useState(false);
@@ -282,6 +284,7 @@ export default function ToursScreen() {
 								key={tour.id}
 								activeOpacity={0.9}
 								className="rounded-3xl overflow-hidden"
+								onPress={() => navigation.navigate('TourDetails', { tourId: tour.id })}
 								style={{
 									width: 280,
 									backgroundColor: colors.surface.card,
@@ -406,6 +409,7 @@ export default function ToursScreen() {
 						key={tour.id}
 						activeOpacity={0.9}
 						className="rounded-3xl mb-4 overflow-hidden flex-row"
+						onPress={() => navigation.navigate('TourDetails', { tourId: tour.id })}
 						style={{
 							backgroundColor: colors.surface.card,
 							borderWidth: 1.5,

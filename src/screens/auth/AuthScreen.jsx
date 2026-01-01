@@ -39,6 +39,7 @@ export default function AuthScreen({ onAuthSuccess }) {
 				const res = await apiRequest('/users/login', 'POST', { email, password });
 				if (res && res.success) {
 					if (res.token) await AsyncStorage.setItem('token', res.token);
+					if (res.user) await AsyncStorage.setItem('user', JSON.stringify(res.user));
 					onAuthSuccess && onAuthSuccess(res.user || null);
 				} else {
 					Alert.alert('Erro', res?.msg || 'Falha no login');

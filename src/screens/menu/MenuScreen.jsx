@@ -1,22 +1,77 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../contexts';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import apiRequest from '../../scripts/requests';
+import * as Updates from 'expo-updates';
+import { Alert } from 'react-native';
 
 export default function MenuScreen() {
 	const { colors, isDark, toggleTheme } = useTheme();
 
-	// Dados do usuário (simulação)
-	const user = {
+	// Dados do usuário (carregados do AsyncStorage se disponível)
+	const [user, setUser] = useState({
 		name: 'João Silva',
 		email: 'joao.silva@email.com',
-		avatar: 'https://i.pravatar.cc/150?img=12',
+		avatar: 'https://avatars.dicebear.com/api/identicon/default.png',
 		memberSince: 'Membro desde 2024',
 		completedBookings: 5,
 		completedStays: 12,
 		completedTransports: 7,
 		verified: true,
-	};
+	});
+
+	useEffect(() => {
+		const loadUser = async () => {
+			try {
+				const stored = await AsyncStorage.getItem('user');
+				if (stored) {
+					const u = JSON.parse(stored);
+					setUser(prev => ({
+						...prev,
+						name: u.name ? (u.surname ? `${u.name} ${u.surname}` : u.name) : prev.name,
+						email: u.email || prev.email,
+						avatar: u.avatar || `https://avatars.dicebear.com/api/identicon/${encodeURIComponent(u.email || 'default')}.png`,
+						memberSince: u.registered ? `Membro desde ${new Date(u.registered).getFullYear()}` : prev.memberSince,
+					}));
+				}
+			} catch (err) {
+				console.warn('Erro ao carregar usuário:', err);
+			}
+		};
+
+		loadUser();
+	}, []);
+
+	function confirmLogout() {
+		Alert.alert(
+			'Encerrar sessão',
+			'Deseja realmente encerrar a sessão?',
+			[
+				{ text: 'Cancelar', style: 'cancel' },
+				{ text: 'Sair', onPress: () => { handleLogout(); } },
+			],
+			{ cancelable: true }
+		);
+	}
+
+	async function handleLogout() {
+		try {
+			// Call backend logout
+			await apiRequest('/users/logout', 'POST');
+		} catch (err) {
+			console.warn('Logout API error:', err);
+		}
+
+		try {
+			await AsyncStorage.removeItem('token');
+			await AsyncStorage.removeItem('user');
+			// O App.jsx detectará automaticamente a ausência do token
+		} catch (err) {
+			console.warn('Erro ao limpar AsyncStorage:', err);
+		}
+	}
 
 	const menuSections = [
 		{
@@ -379,6 +434,11 @@ export default function MenuScreen() {
 								<TouchableOpacity
 									key={itemIndex}
 									className="flex-row items-center p-4"
+									onPress={() => {
+										if (item.danger) {
+											confirmLogout();
+										}
+									}}
 									style={{
 										borderBottomWidth: itemIndex < section.items.length - 1 ? 1 : 0,
 										borderBottomColor: isDark ? `${colors.primary.vivid}10` : colors.border.light,

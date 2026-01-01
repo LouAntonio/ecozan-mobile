@@ -1,13 +1,63 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Image, TextInput, Modal } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, Image, TextInput, Modal, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../contexts';
+import apiRequest from '../../scripts/requests';
 
 export default function ToursScreen() {
 	const { colors, isDark } = useTheme();
 	const [selectedCategory, setSelectedCategory] = useState('all');
 	const [selectedDuration, setSelectedDuration] = useState('all');
 	const [showFilters, setShowFilters] = useState(false);
+	const [tours, setTours] = useState([]);
+	const [provinces, setProvinces] = useState([]);
+	const [loading, setLoading] = useState(true);
+
+	// Buscar tours e províncias da API
+	useEffect(() => {
+		const fetchData = async () => {
+			try {
+				setLoading(true);
+				const [toursResponse, provincesResponse] = await Promise.all([
+					apiRequest('/tours'),
+					apiRequest('/provinces')
+				]);
+
+				if (toursResponse.success) {
+					setTours(toursResponse.data);
+				}
+				if (provincesResponse.success) {
+					setProvinces(provincesResponse.data);
+				}
+			} catch (error) {
+				console.error('Error fetching data:', error);
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		fetchData();
+	}, []);
+
+	// Função para obter o nome da província pelo ID
+	const getProvinceName = (locationId) => {
+		const province = provinces.find(p => p.id === locationId);
+		return province ? province.name : 'Localização não disponível';
+	};
+
+	// Função para formatar preço
+	const formatPrice = (price) => {
+		return new Intl.NumberFormat('pt-AO').format(price);
+	};
+
+	// Função para parsear a galeria (string JSON)
+	const parseGallery = (galleryString) => {
+		try {
+			return JSON.parse(galleryString);
+		} catch {
+			return [];
+		}
+	};
 
 	// Categorias de tours
 	const categories = [
@@ -26,115 +76,27 @@ export default function ToursScreen() {
 		{ id: 'multi', label: 'Vários dias', icon: 'calendar-outline' },
 	];
 
-	// Tours disponíveis
-	const tours = [
-		{
-			id: 1,
-			title: 'Ilha do Mussulo - Excursão',
-			category: 'water',
-			image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800',
-			duration: 'full',
-			durationText: 'Dia inteiro',
-			price: '35000',
-			rating: 4.9,
-			reviews: 234,
-			groupSize: '2-20',
-			highlights: ['Praias', 'Almoço de marisco', 'Dunas'],
-			description: 'Passeio de barco até a Ilha do Mussulo com tempo para praia e almoço',
-			location: 'Ilha do Mussulo, Luanda',
-			included: ['Barco', 'Almoço', 'Guia', 'Bebidas'],
-		},
-		{
-			id: 2,
-			title: 'Centro Histórico de Luanda',
-			category: 'culture',
-			image: 'https://images.unsplash.com/photo-1609137144813-7d9921338f24?w=800',
-			duration: 'half',
-			durationText: '4 horas',
-			price: '15000',
-			rating: 4.8,
-			reviews: 189,
-			groupSize: '1-12',
-			highlights: ['Museus', 'Mercado do Kinaxixi', 'Forte de São Miguel'],
-			description: 'Tour a pé pelo centro histórico de Luanda, museus e mercados tradicionais',
-			location: 'Luanda',
-			included: ['Guia', 'Entradas', 'Degustação'],
-		},
-		{
-			id: 3,
-			title: 'Cabo Ledo - Surf e Praia',
-			category: 'nature',
-			image: 'https://images.unsplash.com/photo-1596040033229-a0b44b7ff4e9?w=800',
-			duration: 'full',
-			durationText: 'Dia inteiro',
-			price: '20000',
-			rating: 4.7,
-			reviews: 156,
-			groupSize: '2-15',
-			highlights: ['Praia', 'Surf', 'Trilhas'],
-			description: 'Dia na costa do Lobito/Cabo Ledo com aulas de surf e tempo livre',
-			location: 'Cabo Ledo / Lobito',
-			included: ['Transporte', 'Aula de surf', 'Almoço'],
-		},
-		{
-			id: 4,
-			title: 'Observação de Golfinhos',
-			category: 'water',
-			image: 'https://images.unsplash.com/photo-1607153333879-c174d265f1d2?w=800',
-			duration: 'half',
-			durationText: '3-4 horas',
-			price: '18000',
-			rating: 4.9,
-			reviews: 312,
-			groupSize: '2-12',
-			highlights: ['Golfinhos', 'Snorkel', 'Praia'],
-			description: 'Saída marítima para observação de golfinhos e snorkel na costa de Luanda',
-			location: 'Barra do Dande / Luanda',
-			included: ['Barco', 'Equipamento snorkel', 'Guia'],
-		},
-		{
-			id: 5,
-			title: 'Kissama National Park',
-			category: 'nature',
-			image: 'https://images.unsplash.com/photo-1564760055775-d63b17a55c44?w=800',
-			duration: 'full',
-			durationText: 'Dia inteiro',
-			price: '30000',
-			rating: 4.6,
-			reviews: 98,
-			groupSize: '2-20',
-			highlights: ['Vida selvagem', 'Safári', 'Trilhas'],
-			description: 'Safari de dia inteiro no Parque Nacional Quiçama (Kissama)',
-			location: 'Quiçama / Luanda',
-			included: ['Transporte 4x4', 'Guia', 'Almoço'],
-		},
-		{
-			id: 6,
-			title: 'Ilha de Mussulo - Meio dia',
-			category: 'adventure',
-			image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800',
-			duration: 'half',
-			durationText: '3 horas',
-			price: '12000',
-			rating: 4.7,
-			reviews: 145,
-			groupSize: '2-20',
-			highlights: ['Praia', 'Passeio de barco', 'Relax'],
-			description: 'Meio dia na Ilha do Mussulo para banhos e atividades leves',
-			location: 'Ilha do Mussulo',
-			included: ['Barco', 'Entrada', 'Guia'],
-		},
-	];
-
-	// Filtrar tours
+	// Filtrar tours - simplificado já que não temos categorias e durações específicas na API
 	const filteredTours = tours.filter(tour => {
-		const categoryMatch = selectedCategory === 'all' || tour.category === selectedCategory;
-		const durationMatch = selectedDuration === 'all' || tour.duration === selectedDuration;
-		return categoryMatch && durationMatch;
+		// Por enquanto, mantemos apenas o filtro básico
+		// Você pode adicionar lógica de filtro mais tarde quando tiver essas informações
+		return true;
 	});
 
-	// Tours em destaque
-	const featuredTours = tours.slice(0, 3);
+	// Tours em destaque (featured = 1)
+	const featuredTours = tours.filter(tour => tour.featured === 1);
+
+	// Mostrar loading state
+	if (loading) {
+		return (
+			<View className="flex-1 justify-center items-center" style={{ backgroundColor: colors.background.primary }}>
+				<ActivityIndicator size="large" color={colors.primary.vivid} />
+				<Text className="mt-4 text-base" style={{ color: colors.text.secondary }}>
+					Carregando passeios...
+				</Text>
+			</View>
+		);
+	}
 
 	return (
 		<ScrollView
@@ -351,10 +313,7 @@ export default function ToursScreen() {
 									>
 										<Ionicons name="star" size={14} color="#F59E0B" />
 										<Text className="font-bold text-sm ml-1" style={{ color: '#1F2937' }}>
-											{tour.rating}
-										</Text>
-										<Text className="text-xs ml-0.5" style={{ color: '#6B7280' }}>
-											({tour.reviews})
+											{tour.eval}
 										</Text>
 									</View>
 									{/* Favorite */}
@@ -371,7 +330,7 @@ export default function ToursScreen() {
 										className="text-lg font-bold mb-1"
 										style={{ color: colors.text.primary }}
 									>
-										{tour.title}
+										{tour.name}
 									</Text>
 									<View className="flex-row items-center mb-3">
 										<Ionicons name="location" size={14} color={colors.text.secondary} />
@@ -379,14 +338,14 @@ export default function ToursScreen() {
 											className="text-xs ml-1 mr-2"
 											style={{ color: colors.text.secondary }}
 										>
-											{tour.location}
+											{getProvinceName(tour.location)}
 										</Text>
 										<Ionicons name="time" size={14} color={colors.text.secondary} />
 										<Text
 											className="text-xs ml-1"
 											style={{ color: colors.text.secondary }}
 										>
-											{tour.durationText}
+											{tour.duration}
 										</Text>
 									</View>
 
@@ -396,14 +355,14 @@ export default function ToursScreen() {
 												className="text-xs mb-0.5"
 												style={{ color: colors.text.secondary }}
 											>
-												A partir de
+												{tour.price_modality}
 											</Text>
 											<View className="flex-row items-baseline">
 												<Text
 													className="text-2xl font-bold"
 													style={{ color: colors.primary.vivid }}
 												>
-													Kz {tour.price}
+													Kz {formatPrice(tour.price)}
 												</Text>
 												<Ionicons name="person" size={14} color={colors.text.secondary} style={{ marginLeft: 6 }} />
 											</View>
@@ -472,7 +431,7 @@ export default function ToursScreen() {
 								<View className="flex-row items-center">
 									<Ionicons name="star" size={12} color="#F59E0B" />
 									<Text className="text-white text-xs font-bold ml-1">
-										{tour.rating}
+										{tour.eval}
 									</Text>
 								</View>
 							</View>
@@ -483,7 +442,7 @@ export default function ToursScreen() {
 								className="text-base font-bold mb-1"
 								style={{ color: colors.text.primary }}
 							>
-								{tour.title}
+								{tour.name}
 							</Text>
 							
 							<View className="flex-row items-center mb-2">
@@ -492,7 +451,7 @@ export default function ToursScreen() {
 									className="text-xs ml-1"
 									style={{ color: colors.text.secondary }}
 								>
-									{tour.location}
+									{getProvinceName(tour.location)}
 								</Text>
 							</View>
 
@@ -504,28 +463,6 @@ export default function ToursScreen() {
 								{tour.description}
 							</Text>
 
-							<View className="flex-row flex-wrap gap-1 mb-2">
-								{tour.highlights.slice(0, 2).map((highlight, idx) => (
-									<View
-										key={idx}
-										className="px-2 py-1 rounded-lg flex-row items-center"
-										style={{
-											backgroundColor: isDark
-												? `${colors.primary.vivid}10`
-												: colors.background.primary,
-										}}
-									>
-										<Ionicons name="checkmark-circle" size={12} color={colors.primary.vivid} />
-										<Text
-											className="text-[10px] ml-0.5 font-medium"
-											style={{ color: colors.text.secondary }}
-										>
-											{highlight}
-										</Text>
-									</View>
-								))}
-							</View>
-
 							<View className="flex-row items-center justify-between mt-auto">
 									<View className="flex-row items-center">
 										<Ionicons name="time-outline" size={14} color={colors.text.secondary} />
@@ -533,16 +470,15 @@ export default function ToursScreen() {
 											className="text-xs ml-1 mr-3"
 											style={{ color: colors.text.secondary }}
 										>
-											{tour.durationText}
+											{tour.duration}
 										</Text>
 											<View className="flex-row items-baseline">
 												<Text
 													className="text-lg font-bold"
 													style={{ color: colors.primary.vivid }}
 												>
-													Kz {tour.price}
+													Kz {formatPrice(tour.price)}
 												</Text>
-												<Ionicons name="person" size={12} color={colors.text.secondary} style={{ marginLeft: 6 }} />
 											</View>
 									</View>
 									<TouchableOpacity

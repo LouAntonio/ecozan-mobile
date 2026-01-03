@@ -22,7 +22,8 @@
         "backgroundColor": "#1F6F3A"
       },
       "edgeToEdgeEnabled": true,
-      "backgroundColor": "#121212"
+      "backgroundColor": "#121212",
+      "package": "com.louantonio.ecozan"
     },
     "web": {
       "favicon": "./assets/favicon.png",
